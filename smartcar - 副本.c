@@ -13,13 +13,25 @@
 #define FILE_NUM (sizeof(filepath) / (50 * sizeof(char)))
 static char filepath[][50] = {
 	"pic\\1.txt",
+	"pic\\2.txt",
+    "pic\\3.txt",
+    "pic\\4.txt",
+    "pic\\5.txt",
+    "pic\\6.txt",
+    "pic\\7.txt",
+	"pic\\8.txt",
+    "pic\\9.txt",
     "pic\\10.txt",
+    "pic\\11.txt",
+    "pic\\12.txt",   
+	"pic\\13.txt",
+	"pic\\14.txt",
+    "pic\\15.txt",
+    "pic\\16.txt",
     "pic\\17.txt",
-    "pic\\18.txt",
-    //"pic\\19.txt",
-    //"pic\\31.txt",
-    //"pic\\50.txt",    
-
+    "pic\\18.txt",   
+    "pic\\19.txt",
+    "pic\\20.txt",   
     
 };
 
@@ -39,11 +51,11 @@ static char filepath[][50] = {
 #define COLUMN_END 126
 #define CENTER     62*/ 
 /*=== 提取边线和中线算法配置项 ===*/
-#define ROW_START       (ROW-3)
+#define ROW_START       (ROW-10)//3 
 #define DELTA_THRESHOLD 30
 //黑白的跳变域值 
 #define THRESHOLD  115 //125
-#define CENTER 105//119 // 实际图像中间值
+#define CENTER 119//119 // 实际图像中间值
 #define BOUND_RADIUS 5 // 边界搜索半径
 #define SINGLE_RADIUS 15      // 单线判别半径
 
@@ -51,7 +63,7 @@ static char filepath[][50] = {
 #define LOSERL_THRESHOLD 7 // 右线丢失补线启发阈值
 #define CROSSROAD_THRESHOLD 7 // 十字路口补线启发阈值
 //=== 提取边线和中线算法配置项 ===
-#define COLUMN_START 10 //40
+#define COLUMN_START 40 //40
 #define COLUMN_END 199 //199
 #define COMPLEMENT_DIST 120
 
@@ -346,7 +358,7 @@ void GetBlackLine()
     {
         Line_Center[row] = Line_Center_L[row] = Line_Center_R[row] = -1; // 复位该行结果数组
 
-        if (singleline_mode == 1) {
+        /*if (singleline_mode == 1) {
             // 左线为中心线
             for (column = leftline_rightbound; column >= leftline_leftbound; column--)
             {
@@ -407,13 +419,13 @@ void GetBlackLine()
                 rightline_rightbound = COLUMN_END - 1;
                 singleline_mode = 0;
             }
-        }
+        }*/ 
 
 
         // 根据上一次搜索到的右边界限制左边界的搜索范围
-       // if (row < ROW_START && Line_Center_L[row + 1] != leftline_lastvalid && Line_Center_R[row + 1] == rightline_lastvalid)
+        if (row < ROW_START && Line_Center_L[row + 1] != leftline_lastvalid && Line_Center_R[row + 1] == rightline_lastvalid)
        //上一条左线不等于最近有效的值，上一条右线等于最近有效的值 
-        if (row < ROW_START && Line_Center_L[row + 1] != leftline_lastvalid)
+        //if (row < ROW_START && Line_Center_L[row + 1] != leftline_lastvalid)
         //上一条左线不等于最近有效的值，表示上次未找到左线 
         { 
             leftline_rightbound = Line_Center_R[row + 1] - 1;  //左线右边界 为上次的右线 
@@ -466,7 +478,8 @@ void GetBlackLine()
         // 左线丢线，可能为左转，也有可能仅仅是超出图像边界
         if (Line_Center_L[row] == -1 && Line_Center_R[row] > 0)
         {
-            if (crossroad >= CROSSROAD_THRESHOLD) {
+            if (crossroad >= CROSSROAD_THRESHOLD) 
+			{
                 crossroad++;
                 // 按最后一次找到的左线位置重设左线搜索左边界
                 leftline_leftbound = leftline_lastvalid != -1 && leftline_lastvalid - BOUND_RADIUS > COLUMN_START ?
@@ -474,7 +487,8 @@ void GetBlackLine()
                 // 从中间开始搜索
                 leftline_rightbound = CENTER;
             }
-            else {
+           /* else 
+			{
                 tmp = row < ROW_START && Line_Center[row + 1] != -1 ? Line_Center[row + 1] : CENTER;
                 if (tmp - SINGLE_RADIUS <= Line_Center_R[row] && Line_Center_R[row] <= tmp + SINGLE_RADIUS) {
                     Line_Center[row] = Line_Center_R[row];
@@ -484,7 +498,7 @@ void GetBlackLine()
 #endif
                     continue;
                 }
-            }
+            }*/ 
             leftline_lost++;
             // 补左线
             Line_Center_L[row] = row < ROW_START && Line_Center_L[row + 1] != -1 ?
@@ -505,7 +519,7 @@ void GetBlackLine()
                 rightline_rightbound = rightline_lastvalid != -1 && rightline_lastvalid + BOUND_RADIUS < COLUMN_END ?
                     rightline_lastvalid + BOUND_RADIUS : COLUMN_END - 1;
             }
-            else {
+            /*else {
                 tmp = row < ROW_START && Line_Center[row + 1] != -1 ? Line_Center[row + 1] : CENTER ;
                 if (tmp - SINGLE_RADIUS <= Line_Center_L[row] && Line_Center_L[row] <= tmp + SINGLE_RADIUS) {
                     Line_Center[row] = Line_Center_L[row];
@@ -515,7 +529,7 @@ void GetBlackLine()
 #endif
                     continue;
                 }
-            }
+            }*/ 
             
             rightline_lost++; // 增加右线丢失计数
 
@@ -572,7 +586,7 @@ void GetBlackLine()
             else {
                 leftline_lost = rightline_lost = 0;
                 tmp = row < ROW_START && Line_Center[row + 1] != -1 ? Line_Center[row + 1] : CENTER;
-                if (tmp - SINGLE_RADIUS <= Line_Center_L[row] && Line_Center_L[row] <= tmp + SINGLE_RADIUS) {
+                /*if (tmp - SINGLE_RADIUS <= Line_Center_L[row] && Line_Center_L[row] <= tmp + SINGLE_RADIUS) {
                     Line_Center[row] = Line_Center_L[row];
                     singleline_mode = 1;
 #ifdef G_PRINT
@@ -587,9 +601,9 @@ void GetBlackLine()
                     printp("Line %d find single line: %d %d %d\n", row, Line_Center_L[row], Line_Center[row], Line_Center_R[row]);
 #endif
                     continue;
-                }
+                }*/ 
                 Line_Center[row] = (Line_Center_L[row] + Line_Center_R[row]) / 2; // 计算中线 
-            }
+            }  
 #ifdef G_PRINT
             printp("Line %d find out both lines: %d %d %d\n", row, Line_Center_L[row], Line_Center[row], Line_Center_R[row]);
 #endif
